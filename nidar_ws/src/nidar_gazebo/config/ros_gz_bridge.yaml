@@ -1,0 +1,60 @@
+- ros_topic_name: "/clock"
+  gz_topic_name: "/clock"
+  ros_type_name: "rosgraph_msgs/msg/Clock"
+  gz_type_name: "gz.msgs.Clock"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/airmouse/scan"
+  gz_topic_name: "/airmouse/scan"
+  ros_type_name: "sensor_msgs/msg/LaserScan"
+  gz_type_name: "gz.msgs.LaserScan"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/airmouse/camera/image_raw"
+  gz_topic_name: "/airmouse/camera/image"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/airmouse/camera/depth_image"
+  gz_topic_name: "/airmouse/camera/depth_image"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/airmouse/imu"
+  gz_topic_name: "/airmouse/imu"
+  ros_type_name: "sensor_msgs/msg/Imu"
+  gz_type_name: "gz.msgs.IMU"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/cmd_vel"
+  gz_topic_name: "/cmd_vel"
+  ros_type_name: "geometry_msgs/msg/Twist"
+  gz_type_name: "gz.msgs.Twist"
+  direction: ROS_TO_GZ
+
+# Multi-Drone camera topics for RescueSwarm x500_depth
+- ros_topic_name: "/drone_0/camera/image_raw"
+  gz_topic_name: "/world/rescueswarm_flood_zone/model/x500_depth_0/link/camera_link/sensor/camera/image"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/drone_1/camera/image_raw"
+  gz_topic_name: "/world/rescueswarm_flood_zone/model/x500_depth_1/link/camera_link/sensor/camera/image"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/drone_0/scan"
+  gz_topic_name: "/world/rescueswarm_flood_zone/model/x500_depth_0/link/link/sensor/lidar_2d_v2/scan"
+  ros_type_name: "sensor_msgs/msg/LaserScan"
+  gz_type_name: "gz.msgs.LaserScan"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/drone_1/scan"
+  gz_topic_name: "/world/rescueswarm_flood_zone/model/x500_depth_1/link/link/sensor/lidar_2d_v2/scan"
+  ros_type_name: "sensor_msgs/msg/LaserScan"
+  gz_type_name: "gz.msgs.LaserScan"
+  direction: GZ_TO_ROS

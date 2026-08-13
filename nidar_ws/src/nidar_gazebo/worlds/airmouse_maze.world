@@ -1,0 +1,262 @@
+<?xml version="1.0" ?>
+<sdf version="1.9">
+  <world name="airmouse_maze_world">
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.002</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <plugin
+      filename="gz-sim-physics-system"
+      name="gz::sim::systems::Physics">
+    </plugin>
+    <plugin
+      filename="gz-sim-user-commands-system"
+      name="gz::sim::systems::UserCommands">
+    </plugin>
+    <plugin
+      filename="gz-sim-scene-broadcaster-system"
+      name="gz::sim::systems::SceneBroadcaster">
+    </plugin>
+    <plugin
+      filename="gz-sim-sensors-system"
+      name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin
+      filename="gz-sim-imu-system"
+      name="gz::sim::systems::Imu">
+    </plugin>
+
+    <!-- Directional Light -->
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <!-- Ground Plane / Arena Floor -->
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>20 20</size>
+            </plane>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>20 20</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.3 0.3 0.3 1</ambient>
+            <diffuse>0.5 0.5 0.5 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Outer Perimeter Walls (15m x 15m arena, 2.44m / 8ft height) -->
+    <!-- North Wall -->
+    <model name="wall_north">
+      <static>true</static>
+      <pose>7.5 15 1.22 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>15 0.2 2.44</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>15 0.2 2.44</size></box></geometry>
+          <material><ambient>0.7 0.7 0.7 1</ambient><diffuse>0.8 0.8 0.8 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- South Wall -->
+    <model name="wall_south">
+      <static>true</static>
+      <pose>7.5 0 1.22 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>15 0.2 2.44</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>15 0.2 2.44</size></box></geometry>
+          <material><ambient>0.7 0.7 0.7 1</ambient><diffuse>0.8 0.8 0.8 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- East Wall -->
+    <model name="wall_east">
+      <static>true</static>
+      <pose>15 7.5 1.22 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.2 15 2.44</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>0.2 15 2.44</size></box></geometry>
+          <material><ambient>0.7 0.7 0.7 1</ambient><diffuse>0.8 0.8 0.8 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- West Wall (with Entry/Exit gap at y=0.5 to y=1.5) -->
+    <model name="wall_west_lower">
+      <static>true</static>
+      <pose>0 4.0 1.22 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.2 6.0 2.44</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>0.2 6.0 2.44</size></box></geometry>
+          <material><ambient>0.7 0.7 0.7 1</ambient><diffuse>0.8 0.8 0.8 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="wall_west_upper">
+      <static>true</static>
+      <pose>0 11.0 1.22 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.2 8.0 2.44</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>0.2 8.0 2.44</size></box></geometry>
+          <material><ambient>0.7 0.7 0.7 1</ambient><diffuse>0.8 0.8 0.8 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Top Mesh Net / Ceiling Cover -->
+    <model name="top_net">
+      <static>true</static>
+      <pose>7.5 7.5 2.44 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>15 15 0.02</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>15 15 0.02</size></box></geometry>
+          <material><ambient>0.1 0.1 0.1 0.5</ambient><diffuse>0.2 0.2 0.2 0.5</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Internal Maze Room & Corridor Walls -->
+    <!-- Wall Segment 1 -->
+    <model name="int_wall_1">
+      <static>true</static>
+      <pose>3.0 4.0 1.22 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.1 6.0 2.44</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>0.1 6.0 2.44</size></box></geometry>
+          <material><ambient>0.5 0.5 0.5 1</ambient><diffuse>0.6 0.6 0.6 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Wall Segment 2 -->
+    <model name="int_wall_2">
+      <static>true</static>
+      <pose>6.0 8.0 1.22 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>6.0 0.1 2.44</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>6.0 0.1 2.44</size></box></geometry>
+          <material><ambient>0.5 0.5 0.5 1</ambient><diffuse>0.6 0.6 0.6 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Wall Segment 3 -->
+    <model name="int_wall_3">
+      <static>true</static>
+      <pose>9.0 4.0 1.22 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.1 6.0 2.44</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>0.1 6.0 2.44</size></box></geometry>
+          <material><ambient>0.5 0.5 0.5 1</ambient><diffuse>0.6 0.6 0.6 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Wall Segment 4 -->
+    <model name="int_wall_4">
+      <static>true</static>
+      <pose>12.0 10.0 1.22 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.1 8.0 2.44</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>0.1 8.0 2.44</size></box></geometry>
+          <material><ambient>0.5 0.5 0.5 1</ambient><diffuse>0.6 0.6 0.6 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Survivors (6 distinct target models placed in rooms/corridors) -->
+    <!-- Survivor 1 (Grid A2: x=1.5, y=2.0) -->
+    <model name="survivor_1">
+      <static>true</static>
+      <pose>1.5 2.0 0.4 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><capsule><radius>0.25</radius><length>0.8</length></capsule></geometry></collision>
+        <visual name="vis"><geometry><capsule><radius>0.25</radius><length>0.8</length></capsule></geometry>
+          <material><ambient>0.9 0.1 0.1 1</ambient><diffuse>1.0 0.2 0.2 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Survivor 2 (Grid B5: x=4.5, y=6.0) -->
+    <model name="survivor_2">
+      <static>true</static>
+      <pose>4.5 6.0 0.4 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><capsule><radius>0.25</radius><length>0.8</length></capsule></geometry></collision>
+        <visual name="vis"><geometry><capsule><radius>0.25</radius><length>0.8</length></capsule></geometry>
+          <material><ambient>0.9 0.1 0.1 1</ambient><diffuse>1.0 0.2 0.2 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Survivor 3 (Grid C3: x=7.5, y=3.0) -->
+    <model name="survivor_3">
+      <static>true</static>
+      <pose>7.5 3.0 0.4 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><capsule><radius>0.25</radius><length>0.8</length></capsule></geometry></collision>
+        <visual name="vis"><geometry><capsule><radius>0.25</radius><length>0.8</length></capsule></geometry>
+          <material><ambient>0.9 0.1 0.1 1</ambient><diffuse>1.0 0.2 0.2 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Survivor 4 (Grid D6: x=10.5, y=11.0) -->
+    <model name="survivor_4">
+      <static>true</static>
+      <pose>10.5 11.0 0.4 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><capsule><radius>0.25</radius><length>0.8</length></capsule></geometry></collision>
+        <visual name="vis"><geometry><capsule><radius>0.25</radius><length>0.8</length></capsule></geometry>
+          <material><ambient>0.9 0.1 0.1 1</ambient><diffuse>1.0 0.2 0.2 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Survivor 5 (Grid E4: x=13.5, y=4.5) -->
+    <model name="survivor_5">
+      <static>true</static>
+      <pose>13.5 4.5 0.4 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><capsule><radius>0.25</radius><length>0.8</length></capsule></geometry></collision>
+        <visual name="vis"><geometry><capsule><radius>0.25</radius><length>0.8</length></capsule></geometry>
+          <material><ambient>0.9 0.1 0.1 1</ambient><diffuse>1.0 0.2 0.2 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Survivor 6 (Grid E7: x=13.5, y=13.0) -->
+    <model name="survivor_6">
+      <static>true</static>
+      <pose>13.5 13.0 0.4 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><capsule><radius>0.25</radius><length>0.8</length></capsule></geometry></collision>
+        <visual name="vis"><geometry><capsule><radius>0.25</radius><length>0.8</length></capsule></geometry>
+          <material><ambient>0.9 0.1 0.1 1</ambient><diffuse>1.0 0.2 0.2 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>

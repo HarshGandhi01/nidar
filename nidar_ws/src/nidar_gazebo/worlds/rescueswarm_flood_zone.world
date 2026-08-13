@@ -1,0 +1,151 @@
+<?xml version="1.0" ?>
+<sdf version="1.9">
+  <world name="rescueswarm_flood_zone_world">
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.004</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <plugin
+      filename="gz-sim-physics-system"
+      name="gz::sim::systems::Physics">
+    </plugin>
+    <plugin
+      filename="gz-sim-user-commands-system"
+      name="gz::sim::systems::UserCommands">
+    </plugin>
+    <plugin
+      filename="gz-sim-scene-broadcaster-system"
+      name="gz::sim::systems::SceneBroadcaster">
+    </plugin>
+    <plugin
+      filename="gz-sim-sensors-system"
+      name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin
+      filename="gz-sim-navsat-system"
+      name="gz::sim::systems::NavSat">
+    </plugin>
+    <plugin
+      filename="gz-sim-imu-system"
+      name="gz::sim::systems::Imu">
+    </plugin>
+
+    <!-- Sun Light -->
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 100 0 0 0</pose>
+      <diffuse>0.9 0.9 0.8 1</diffuse>
+      <specular>0.3 0.3 0.3 1</specular>
+      <direction>-0.5 0.2 -0.8</direction>
+    </light>
+
+    <!-- 10-Hectare Flood Ground Plane (316m x 316m) -->
+    <model name="flood_ground">
+      <static>true</static>
+      <link name="link">
+        <collision name="col"><geometry><plane><normal>0 0 1</normal><size>320 320</size></plane></geometry></collision>
+        <visual name="vis"><geometry><plane><normal>0 0 1</normal><size>320 320</size></plane></geometry>
+          <material><ambient>0.1 0.3 0.4 1</ambient><diffuse>0.15 0.35 0.5 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Simulated Houses / Dry Patches in Flood Zone -->
+    <model name="house_1">
+      <static>true</static>
+      <pose>50 40 2.5 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>10 10 5</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>10 10 5</size></box></geometry>
+          <material><ambient>0.6 0.4 0.3 1</ambient><diffuse>0.7 0.5 0.4 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="house_2">
+      <static>true</static>
+      <pose>-80 100 2.0 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>12 8 4</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>12 8 4</size></box></geometry>
+          <material><ambient>0.6 0.4 0.3 1</ambient><diffuse>0.7 0.5 0.4 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="house_3">
+      <static>true</static>
+      <pose>110 -60 3.0 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>14 14 6</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>14 14 6</size></box></geometry>
+          <material><ambient>0.6 0.4 0.3 1</ambient><diffuse>0.7 0.5 0.4 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Stranded Survivors (10 locations across 10-ha area) -->
+    <!-- Survivor 1 (on roof of house 1) -->
+    <model name="survivor_outdoor_1">
+      <static>true</static>
+      <pose>50 40 5.4 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><capsule><radius>0.3</radius><length>1.0</length></capsule></geometry></collision>
+        <visual name="vis"><geometry><capsule><radius>0.3</radius><length>1.0</length></capsule></geometry>
+          <material><ambient>0.9 0.1 0.1 1</ambient><diffuse>1.0 0.2 0.2 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Survivor 2 (on roof of house 2) -->
+    <model name="survivor_outdoor_2">
+      <static>true</static>
+      <pose>-80 100 4.4 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><capsule><radius>0.3</radius><length>1.0</length></capsule></geometry></collision>
+        <visual name="vis"><geometry><capsule><radius>0.3</radius><length>1.0</length></capsule></geometry>
+          <material><ambient>0.9 0.1 0.1 1</ambient><diffuse>1.0 0.2 0.2 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Survivor 3 (on dry patch) -->
+    <model name="survivor_outdoor_3">
+      <static>true</static>
+      <pose>-30 -50 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><capsule><radius>0.3</radius><length>1.0</length></capsule></geometry></collision>
+        <visual name="vis"><geometry><capsule><radius>0.3</radius><length>1.0</length></capsule></geometry>
+          <material><ambient>0.9 0.1 0.1 1</ambient><diffuse>1.0 0.2 0.2 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Survivor 4 (roof of house 3) -->
+    <model name="survivor_outdoor_4">
+      <static>true</static>
+      <pose>110 -60 6.4 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><capsule><radius>0.3</radius><length>1.0</length></capsule></geometry></collision>
+        <visual name="vis"><geometry><capsule><radius>0.3</radius><length>1.0</length></capsule></geometry>
+          <material><ambient>0.9 0.1 0.1 1</ambient><diffuse>1.0 0.2 0.2 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Survivor 5 -->
+    <model name="survivor_outdoor_5">
+      <static>true</static>
+      <pose>-120 -80 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><capsule><radius>0.3</radius><length>1.0</length></capsule></geometry></collision>
+        <visual name="vis"><geometry><capsule><radius>0.3</radius><length>1.0</length></capsule></geometry>
+          <material><ambient>0.9 0.1 0.1 1</ambient><diffuse>1.0 0.2 0.2 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>

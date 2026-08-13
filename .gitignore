@@ -1,0 +1,17 @@
+# ROS 2 build outputs
+nidar_ws/build/
+nidar_ws/install/
+nidar_ws/log/
+nidar_ws/.colcon/
+
+# Python cache & temp files
+__pycache__/
+*.pyc
+*.pyo
+*.log
+/tmp/
+
+# OS metadata
+.DS_Store
+*.swp
+*~
