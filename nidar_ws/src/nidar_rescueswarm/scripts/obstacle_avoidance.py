@@ -183,17 +183,20 @@ class ObstacleAvoidanceModule:
 
     def compute_swarm_repulsion(self, my_pos, other_drone_positions, drone_name="Drone-0"):
         swarm_repulsion = np.array([0.0, 0.0, 0.0])
-        my_pos_arr = np.array(my_pos[:3])
+        my_n, my_e = my_pos[0], my_pos[1]
 
         for peer_pos in other_drone_positions:
-            peer_pos_arr = np.array(peer_pos[:3])
-            diff = my_pos_arr - peer_pos_arr
-            dist = np.linalg.norm(diff)
+            peer_n, peer_e = peer_pos[0], peer_pos[1]
+            diff_n = my_n - peer_n
+            diff_e = my_e - peer_e
+            dist_2d = math.hypot(diff_n, diff_e)
 
-            if 0.1 < dist < self.swarm_safety_dist:
-                repulsion_mag = (self.swarm_safety_dist - dist) / self.swarm_safety_dist
-                direction = diff / dist
-                swarm_repulsion += direction * repulsion_mag * 2.0
+            if 0.1 < dist_2d < self.swarm_safety_dist:
+                repulsion_mag = (self.swarm_safety_dist - dist_2d) / self.swarm_safety_dist
+                rep_n = (diff_n / dist_2d) * repulsion_mag * 2.0
+                rep_e = (diff_e / dist_2d) * repulsion_mag * 2.0
+                # Purely horizontal push to prevent ground slam
+                swarm_repulsion += np.array([rep_n, rep_e, 0.0])
 
         return swarm_repulsion
 
@@ -224,7 +227,16 @@ class ObstacleAvoidanceModule:
         ev_norm = np.linalg.norm(combined_evasion[:2])
         if ev_norm > 2.2:
             combined_evasion[:2] = (combined_evasion[:2] / ev_norm) * 2.2
-        combined_evasion[2] = max(-1.2, min(1.2, combined_evasion[2]))
+
+        # Prevent downward vertical push when near ground (alt < 3.0m)
+        if my_pos is not None:
+            my_alt = -my_pos[2]
+            if my_alt < 3.0:
+                combined_evasion[2] = min(0.0, combined_evasion[2])  # Only allow UPWARD (-Down)
+            else:
+                combined_evasion[2] = max(-1.2, min(1.2, combined_evasion[2]))
+        else:
+            combined_evasion[2] = max(-1.2, min(1.2, combined_evasion[2]))
 
         if np.linalg.norm(combined_evasion) > 0.0:
             now = math.floor(datetime.now().timestamp() * 2) / 2

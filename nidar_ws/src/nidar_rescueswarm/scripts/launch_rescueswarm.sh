@@ -19,11 +19,11 @@ PX4_SERVER_CONFIG="${PX4_DIR}/Tools/simulation/gz/server.config"
 
 NUM_DRONES=3
 
-# Drone spawn positions (x,y,z,roll,pitch,yaw) — 6 meters apart
+# Drone spawn positions (x,y,z,roll,pitch,yaw) — 8 meters apart
 DRONE_POSES=(
-    "0,-6.0,0.1,0,0,0"
+    "0,-8.0,0.1,0,0,0"
     "0,0.0,0.1,0,0,0"
-    "0,6.0,0.1,0,0,0"
+    "0,8.0,0.1,0,0,0"
 )
 
 echo "=============================================="

@@ -29,9 +29,9 @@ DRONE_PORTS = [14540, 14541, 14542]
 GRPC_PORTS  = [50051, 50052, 50053]
 
 DRONE_SPAWN_POSES = [
-    (0.0, -6.0), # Drone 0 spawn pad (West)
+    (0.0, -8.0), # Drone 0 spawn pad (West)
     (0.0, 0.0),  # Drone 1 spawn pad (Center)
-    (0.0, 6.0),  # Drone 2 spawn pad (East)
+    (0.0, 8.0),  # Drone 2 spawn pad (East)
 ]
 
 CRUISING_ALT = 8.5
