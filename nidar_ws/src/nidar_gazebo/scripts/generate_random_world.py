@@ -256,6 +256,37 @@ def generate_random_world(output_sdf_path, layout_json_path="/tmp/world_layout.j
       <specular>0.271 0.271 0.271 1</specular>
       <attenuation><range>2000</range><linear>0</linear><constant>1</constant><quadratic>0</quadratic></attenuation>
     </light>
+
+    <!-- Faint Visual Sector Boundary Lines (Drone 0 / Drone 1 / Drone 2 Sectors) -->
+    <model name="border_line_west_center">
+      <static>true</static>
+      <pose>-8.33 0 0.02 0 0 0</pose>
+      <link name="link">
+        <visual name="vis">
+          <geometry><box><size>0.15 50.0 0.03</size></box></geometry>
+          <material>
+            <ambient>0.0 0.85 1.0 0.7</ambient>
+            <diffuse>0.0 0.85 1.0 0.7</diffuse>
+            <emissive>0.0 0.4 0.6 1</emissive>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="border_line_center_east">
+      <static>true</static>
+      <pose>8.33 0 0.02 0 0 0</pose>
+      <link name="link">
+        <visual name="vis">
+          <geometry><box><size>0.15 50.0 0.03</size></box></geometry>
+          <material>
+            <ambient>0.0 0.85 1.0 0.7</ambient>
+            <diffuse>0.0 0.85 1.0 0.7</diffuse>
+            <emissive>0.0 0.4 0.6 1</emissive>
+          </material>
+        </visual>
+      </link>
+    </model>
 """
 
     # Add Houses to SDF
