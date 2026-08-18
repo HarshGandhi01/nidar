@@ -2,7 +2,7 @@
 """
 NIDAR RescueSwarm - Live Nadir Camera Viewer & Visual Red Survivor Detector
 =============================================================================
-Subscribes to ROS 2 camera topics (/drone_0/camera/image_raw, /drone_1/camera/image_raw)
+Subscribes to ROS 2 camera topics (/drone_0/camera/image_raw, /drone_1/camera/image_raw, /drone_2/camera/image_raw)
 and displays real-time OpenCV windows with bounding boxes drawn over red survivors.
 """
 
@@ -21,30 +21,29 @@ class SurvivorCameraViewerNode(Node):
         super().__init__('survivor_camera_viewer')
         self.bridge = CvBridge()
 
-        # Latest images & detection states
+        # Latest images & detection states for 3 drones
         self.img_drone0 = None
         self.img_drone1 = None
+        self.img_drone2 = None
         self.det_drone0 = False
         self.det_drone1 = False
+        self.det_drone2 = False
 
-        # ROS 2 Subscribers for Drone 0 & Drone 1 RGB Cameras
+        # ROS 2 Subscribers for Drone 0, Drone 1 & Drone 2 RGB Cameras
         self.sub_cam0 = self.create_subscription(
-            Image,
-            '/drone_0/camera/image_raw',
-            self.cb_cam0,
-            10
+            Image, '/drone_0/camera/image_raw', self.cb_cam0, 10
         )
         self.sub_cam1 = self.create_subscription(
-            Image,
-            '/drone_1/camera/image_raw',
-            self.cb_cam1,
-            10
+            Image, '/drone_1/camera/image_raw', self.cb_cam1, 10
+        )
+        self.sub_cam2 = self.create_subscription(
+            Image, '/drone_2/camera/image_raw', self.cb_cam2, 10
         )
 
         # Timer to render OpenCV windows at 30 FPS
         self.timer = self.create_timer(0.033, self.render_gui)
 
-        self.get_logger().info("NIDAR Survivor Camera Viewer Started. Listening on /drone_0/camera/image_raw and /drone_1/camera/image_raw ...")
+        self.get_logger().info("NIDAR Survivor Camera Viewer Started for 3 Drones.")
 
     def detect_survivor_and_annotate(self, cv_image, drone_name="Drone-0"):
         if cv_image is None:
@@ -53,7 +52,7 @@ class SurvivorCameraViewerNode(Node):
         annotated = cv_image.copy()
         hsv = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
 
-        # HSV red color range (handles hue wrap-around 0-10 & 165-180)
+        # HSV red color range
         lower_red1 = np.array([0, 120, 70])
         upper_red1 = np.array([12, 255, 255])
         lower_red2 = np.array([168, 120, 70])
@@ -127,14 +126,21 @@ class SurvivorCameraViewerNode(Node):
             cv_img = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
             self.det_drone0, self.img_drone0 = self.detect_survivor_and_annotate(cv_img, "Drone-0")
         except Exception as e:
-            self.get_logger().error(f"Cam0 error: {e}")
+            pass
 
     def cb_cam1(self, msg):
         try:
             cv_img = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
             self.det_drone1, self.img_drone1 = self.detect_survivor_and_annotate(cv_img, "Drone-1")
         except Exception as e:
-            self.get_logger().error(f"Cam1 error: {e}")
+            pass
+
+    def cb_cam2(self, msg):
+        try:
+            cv_img = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+            self.det_drone2, self.img_drone2 = self.detect_survivor_and_annotate(cv_img, "Drone-2")
+        except Exception as e:
+            pass
 
     def render_gui(self):
         if self.img_drone0 is not None:
@@ -142,6 +148,9 @@ class SurvivorCameraViewerNode(Node):
 
         if self.img_drone1 is not None:
             cv2.imshow("NIDAR - Drone 1 Nadir Camera Feed", self.img_drone1)
+
+        if self.img_drone2 is not None:
+            cv2.imshow("NIDAR - Drone 2 Nadir Camera Feed", self.img_drone2)
 
         cv2.waitKey(1)
 

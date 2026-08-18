@@ -17,12 +17,13 @@ PX4_GZ_MODELS="${PX4_DIR}/Tools/simulation/gz/models"
 PX4_GZ_WORLDS="${PX4_DIR}/Tools/simulation/gz/worlds"
 PX4_SERVER_CONFIG="${PX4_DIR}/Tools/simulation/gz/server.config"
 
-NUM_DRONES=2
+NUM_DRONES=3
 
-# Drone spawn positions (x,y,z,roll,pitch,yaw) — 5 meters apart
+# Drone spawn positions (x,y,z,roll,pitch,yaw) — 6 meters apart
 DRONE_POSES=(
-    "0,-5.0,0.1,0,0,0"
-    "0,5.0,0.1,0,0,0"
+    "0,-6.0,0.1,0,0,0"
+    "0,0.0,0.1,0,0,0"
+    "0,6.0,0.1,0,0,0"
 )
 
 echo "=============================================="
@@ -125,25 +126,31 @@ for i in $(seq 0 $((NUM_DRONES - 1))); do
 done
 
 # ------------------------------------------------------------------
-# 5. Start ROS 2 <-> Gazebo Harmonic LiDAR Bridge for Both Drones
+# 5. Start ROS 2 <-> Gazebo Harmonic Bridge for 3 Drones
 # ------------------------------------------------------------------
-echo "[INFO] Launching ROS 2 LiDAR Bridge for Drone 0 & Drone 1 ..."
+echo "[INFO] Launching ROS 2 Bridge for Drone 0, Drone 1 & Drone 2 ..."
 source /opt/ros/humble/setup.bash 2>/dev/null || true
 
 ros2 run ros_gz_bridge parameter_bridge \
   /world/rescueswarm_flood_zone/model/x500_depth_0/link/link/sensor/lidar_2d_v2/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan \
   /world/rescueswarm_flood_zone/model/x500_depth_1/link/link/sensor/lidar_2d_v2/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan \
+  /world/rescueswarm_flood_zone/model/x500_depth_2/link/link/sensor/lidar_2d_v2/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan \
   /world/rescueswarm_flood_zone/model/x500_depth_0/link/camera_link/sensor/IMX214/image@sensor_msgs/msg/Image[gz.msgs.Image \
   /world/rescueswarm_flood_zone/model/x500_depth_1/link/camera_link/sensor/IMX214/image@sensor_msgs/msg/Image[gz.msgs.Image \
+  /world/rescueswarm_flood_zone/model/x500_depth_2/link/camera_link/sensor/IMX214/image@sensor_msgs/msg/Image[gz.msgs.Image \
   /world/rescueswarm_flood_zone/model/x500_depth_0/link/camera_link/sensor/StereoOV7251/depth_image@sensor_msgs/msg/Image[gz.msgs.Image \
   /world/rescueswarm_flood_zone/model/x500_depth_1/link/camera_link/sensor/StereoOV7251/depth_image@sensor_msgs/msg/Image[gz.msgs.Image \
+  /world/rescueswarm_flood_zone/model/x500_depth_2/link/camera_link/sensor/StereoOV7251/depth_image@sensor_msgs/msg/Image[gz.msgs.Image \
   --ros-args \
   -r /world/rescueswarm_flood_zone/model/x500_depth_0/link/link/sensor/lidar_2d_v2/scan:=/drone_0/scan \
   -r /world/rescueswarm_flood_zone/model/x500_depth_1/link/link/sensor/lidar_2d_v2/scan:=/drone_1/scan \
+  -r /world/rescueswarm_flood_zone/model/x500_depth_2/link/link/sensor/lidar_2d_v2/scan:=/drone_2/scan \
   -r /world/rescueswarm_flood_zone/model/x500_depth_0/link/camera_link/sensor/IMX214/image:=/drone_0/camera/image_raw \
   -r /world/rescueswarm_flood_zone/model/x500_depth_1/link/camera_link/sensor/IMX214/image:=/drone_1/camera/image_raw \
+  -r /world/rescueswarm_flood_zone/model/x500_depth_2/link/camera_link/sensor/IMX214/image:=/drone_2/camera/image_raw \
   -r /world/rescueswarm_flood_zone/model/x500_depth_0/link/camera_link/sensor/StereoOV7251/depth_image:=/drone_0/depth/image_raw \
-  -r /world/rescueswarm_flood_zone/model/x500_depth_1/link/camera_link/sensor/StereoOV7251/depth_image:=/drone_1/depth/image_raw > /tmp/ros_gz_bridge.log 2>&1 &
+  -r /world/rescueswarm_flood_zone/model/x500_depth_1/link/camera_link/sensor/StereoOV7251/depth_image:=/drone_1/depth/image_raw \
+  -r /world/rescueswarm_flood_zone/model/x500_depth_2/link/camera_link/sensor/StereoOV7251/depth_image:=/drone_2/depth/image_raw > /tmp/ros_gz_bridge.log 2>&1 &
 
 BRIDGE_PID=$!
 
@@ -151,8 +158,9 @@ echo ""
 echo "=============================================="
 echo "  All ${NUM_DRONES} drones spawned!"
 echo ""
-echo "  Drone 0: MAVSDK udp://:14540 (West, initial Y=-5m)"
-echo "  Drone 1: MAVSDK udp://:14541 (East, initial Y=+5m)"
+echo "  Drone 0: MAVSDK udp://:14540 (West, Y=-6m)"
+echo "  Drone 1: MAVSDK udp://:14541 (Center, Y=0m)"
+echo "  Drone 2: MAVSDK udp://:14542 (East, Y=+6m)"
 echo ""
 echo "  Run the RescueSwarm Mission & Perception Controller:"
 echo "    python3 ${NIDAR_WS}/src/nidar_rescueswarm/scripts/rescueswarm_mission.py"

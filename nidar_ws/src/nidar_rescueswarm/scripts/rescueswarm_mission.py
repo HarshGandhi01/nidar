@@ -25,12 +25,13 @@ from mavsdk.offboard import OffboardError, VelocityNedYaw
 from obstacle_avoidance import ObstacleAvoidanceModule
 from perception_and_rescue import SurvivorDetectorAndDropper
 
-DRONE_PORTS = [14540, 14541]
-GRPC_PORTS  = [50051, 50052]
+DRONE_PORTS = [14540, 14541, 14542]
+GRPC_PORTS  = [50051, 50052, 50053]
 
 DRONE_SPAWN_POSES = [
-    (0.0, -5.0), # Drone 0 spawn pad
-    (0.0, 5.0),  # Drone 1 spawn pad
+    (0.0, -6.0), # Drone 0 spawn pad (West)
+    (0.0, 0.0),  # Drone 1 spawn pad (Center)
+    (0.0, 6.0),  # Drone 2 spawn pad (East)
 ]
 
 CRUISING_ALT = 8.5
@@ -47,7 +48,8 @@ shared_rescued_survivors = set()
 # Live camera detection states from ROS 2 subscription
 latest_camera_detections = {
     0: {"detected": False, "timestamp": 0.0},
-    1: {"detected": False, "timestamp": 0.0}
+    1: {"detected": False, "timestamp": 0.0},
+    2: {"detected": False, "timestamp": 0.0}
 }
 
 def get_timestamp():
@@ -66,12 +68,18 @@ class RosSensorSubscriberNode(Node):
         self.sub_cam1 = self.create_subscription(
             Image, '/drone_1/camera/image_raw', lambda msg: self.image_cb(msg, 1), 10
         )
+        self.sub_cam2 = self.create_subscription(
+            Image, '/drone_2/camera/image_raw', lambda msg: self.image_cb(msg, 2), 10
+        )
 
         self.sub_scan0 = self.create_subscription(
             LaserScan, '/drone_0/scan', lambda msg: self.scan_cb(msg, 0), 10
         )
         self.sub_scan1 = self.create_subscription(
             LaserScan, '/drone_1/scan', lambda msg: self.scan_cb(msg, 1), 10
+        )
+        self.sub_scan2 = self.create_subscription(
+            LaserScan, '/drone_2/scan', lambda msg: self.scan_cb(msg, 2), 10
         )
 
     def image_cb(self, msg, drone_idx):
@@ -168,13 +176,20 @@ async def run_drone_rescue_mission(port: int, grpc_port: int, drone_index: int):
     n_max = 25.0 - spawn_y
 
     if drone_index == 0:
+        # Drone 0 (West Sector: Gazebo East [-25, -8.33])
         e_min = -25.0 - spawn_x
-        e_max = 0.0 - spawn_x
-        leg_e_positions = [-22.0, -18.0, -14.0, -10.0, -6.0, -2.0]
+        e_max = -8.33 - spawn_x
+        leg_e_positions = [-22.0, -18.0, -14.0, -10.0]
+    elif drone_index == 1:
+        # Drone 1 (Center Sector: Gazebo East [-8.33, +8.33])
+        e_min = -8.33 - spawn_x
+        e_max = 8.33 - spawn_x
+        leg_e_positions = [-6.0, -2.0, 2.0, 6.0]
     else:
-        e_min = 0.0 - spawn_x
+        # Drone 2 (East Sector: Gazebo East [+8.33, +25.0])
+        e_min = 8.33 - spawn_x
         e_max = 25.0 - spawn_x
-        leg_e_positions = [2.0, 6.0, 10.0, 14.0, 18.0, 22.0]
+        leg_e_positions = [10.0, 14.0, 18.0, 22.0]
 
     geo_n_min = n_min + 1.0
     geo_n_max = n_max - 1.0

@@ -14,8 +14,8 @@ import math
 def generate_random_world(output_sdf_path, layout_json_path="/tmp/world_layout.json"):
     print("[WORLD GENERATOR] Randomizing obstacle, tree & survivor locations for launch...")
 
-    # Designated Drone Spawn Pad locations (Drone 0 at 0,-5 and Drone 1 at 0,+5)
-    drone_spawns = [(0.0, -5.0), (0.0, 5.0)]
+    # Designated Drone Spawn Pad locations (Drone 0 at 0,-6, Drone 1 at 0,0, Drone 2 at 0,+6)
+    drone_spawns = [(0.0, -6.0), (0.0, 0.0), (0.0, 6.0)]
 
     # Strictly enforce min 10.0m clearance around launch pads for vertical takeoff
     TAKEOFF_CLEARANCE = 10.0
