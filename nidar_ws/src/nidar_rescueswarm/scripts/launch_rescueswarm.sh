@@ -122,7 +122,7 @@ for i in $(seq 0 $((NUM_DRONES - 1))); do
     echo "       QGC port:    udp://:$((18570 + INSTANCE))"
     echo "       Log: /tmp/px4_rescueswarm_${INSTANCE}.log"
 
-    sleep 5
+    sleep 1.5
 done
 
 # ------------------------------------------------------------------

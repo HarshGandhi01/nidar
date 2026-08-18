@@ -166,9 +166,9 @@ async def run_drone_rescue_mission(port: int, grpc_port: int, drone_index: int):
     name = f"Drone-{drone_index}"
     spawn_x, spawn_y = DRONE_SPAWN_POSES[drone_index]
 
+    # All pads are 8m apart — launch all drones in parallel!
     if drone_index > 0:
-        stagger = drone_index * 5.0
-        print(f"[{get_timestamp()}] [{name}] Staggering startup by {stagger:.0f}s ...")
+        stagger = drone_index * 0.5
         await asyncio.sleep(stagger)
 
     # Sector bounds
@@ -255,16 +255,19 @@ async def run_drone_rescue_mission(port: int, grpc_port: int, drone_index: int):
             break
         await asyncio.sleep(0.05)
 
-    print(f"[{get_timestamp()}] [{name}] Arming ...")
-    await drone.action.arm()
+    print(f"[{get_timestamp()}] [{name}] Arming & Taking Off ...")
     await drone.action.set_takeoff_altitude(CRUISING_ALT)
-    print(f"[{get_timestamp()}] [{name}] Taking off to {CRUISING_ALT}m ...")
+    await drone.action.arm()
     await drone.action.takeoff()
 
-    async for pos in drone.telemetry.position():
-        if pos.relative_altitude_m > CRUISING_ALT * 0.85:
-            print(f"[{get_timestamp()}] [{name}] Altitude reached: {pos.relative_altitude_m:.1f}m")
+    # Fast 20Hz altitude polling via telemetry stream
+    takeoff_start = time.time()
+    while time.time() - takeoff_start < 10.0:
+        current_alt = -current_pos_ned[2]
+        if current_alt > CRUISING_ALT * 0.8:
+            print(f"[{get_timestamp()}] [{name}] Takeoff target reached: {current_alt:.1f}m")
             break
+        await asyncio.sleep(0.1)
 
     print(f"[{get_timestamp()}] [{name}] Starting offboard mode ...")
     await drone.offboard.set_velocity_ned(VelocityNedYaw(0.0, 0.0, 0.0, 0.0))
@@ -275,9 +278,11 @@ async def run_drone_rescue_mission(port: int, grpc_port: int, drone_index: int):
         print(f"[{get_timestamp()}] [{name}] [FATAL] Offboard Start Failed: {e}")
         return
 
-    print(f"[{get_timestamp()}] [{name}] Stabilizing offboard hold (2s) ...")
+    # Short 0.5s offboard stabilization
     stab_start = asyncio.get_event_loop().time()
-    while (asyncio.get_event_loop().time() - stab_start) < 2.0:
+    while (asyncio.get_event_loop().time() - stab_start) < 0.5:
+        await drone.offboard.set_velocity_ned(VelocityNedYaw(0.0, 0.0, 0.0, 0.0))
+        await asyncio.sleep(0.05)
         await drone.offboard.set_velocity_ned(VelocityNedYaw(0.0, 0.0, 0.0, 0.0))
         await asyncio.sleep(0.1)
 
